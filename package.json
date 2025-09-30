@@ -1,6 +1,6 @@
 {
   "name": "@jszkl/cronned",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Convert natural language to cron expressions.",
   "keywords": [
     "cron",
