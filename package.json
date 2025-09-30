@@ -1,5 +1,5 @@
 {
-  "name": "@jszklarz/cronify",
+  "name": "@jszkl/cronify",
   "version": "0.1.0",
   "description": "🕐 Convert natural language to cron expressions. Write \"every monday at 9am\" instead of \"0 9 * * 1\"",
   "keywords": [
