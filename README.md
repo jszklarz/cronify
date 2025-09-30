@@ -4,7 +4,7 @@
 
 ### Convert natural language to cron expressions
 
-🌍 **Multi-language support** • 🇺🇸 English • 🇪🇸 Spanish
+🌍 **Multi-language support** • 🇺🇸 English • 🇪🇸 Spanish • 🇨🇳 Chinese
 
 #### `every monday at 9am` → `0 9 * * 1`
 
@@ -21,7 +21,7 @@
 
 ## Features
 
-✅ **Multi-language support** - English & Spanish (more coming!) \
+✅ **Multi-language support** - English, Spanish & Chinese \
 ✅ Times, weekdays, dates, intervals, and time windows \
 ✅ Zero dependencies \
 ✅ Output validation \
@@ -55,6 +55,10 @@ if ("crons" in result) {
 // Spanish support! 🇪🇸
 cronned("cada lunes a las 9am", "es");
 // => { crons: ["0 9 * * 1"] }
+
+// Chinese support! 🇨🇳
+cronned("每周一上午9点", "zh");
+// => { crons: ["0 9 * * 1"] }
 ```
 
 ## Multi-Language Support
@@ -62,6 +66,7 @@ cronned("cada lunes a las 9am", "es");
 cronned supports multiple languages! Currently available:
 - 🇺🇸 **English** (default)
 - 🇪🇸 **Spanish**
+- 🇨🇳 **Chinese** (Simplified)
 
 ```typescript
 // English
@@ -70,6 +75,10 @@ cronned("every weekday at 9am")
 
 // Spanish
 cronned("cada día laborable a las 9am", "es")
+// => { crons: ["0 9 * * 1-5"] }
+
+// Chinese
+cronned("工作日上午9点", "zh")
 // => { crons: ["0 9 * * 1-5"] }
 ```
 

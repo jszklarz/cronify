@@ -87,12 +87,12 @@ export function buildCronFields(
   let monthField: string = "*";
   let dayOfWeekField: string = "*";
 
-  // Build locale-aware regex patterns
+  // Build locale-aware regex patterns (no word boundaries for CJK languages)
   const weekdayPattern = locale
-    ? new RegExp(`\\b(${locale.keywords.weekday.join('|')})\\b`)
+    ? new RegExp(`(${locale.keywords.weekday.join('|')})`)
     : /\bweekdays?\b/;
   const weekendPattern = locale
-    ? new RegExp(`\\b(${locale.keywords.weekend.join('|')})\\b`)
+    ? new RegExp(`(${locale.keywords.weekend.join('|')})`)
     : /\bweekends?\b/;
 
   // Months
@@ -164,11 +164,11 @@ export function buildCronFields(
     dayOfMonthField = "1";
   }
 
-  // Simple frequency words
-  const hourlyPattern = locale ? new RegExp(`\\b(${locale.keywords.hourly.join('|')})\\b`) : /\bhourly\b/;
-  const dailyPattern = locale ? new RegExp(`\\b(${locale.keywords.daily.join('|')})\\b`) : /\bdaily\b/;
-  const weeklyPattern = locale ? new RegExp(`\\b(${locale.keywords.weekly.join('|')})\\b`) : /\bweekly\b/;
-  const monthlyPattern = locale ? new RegExp(`\\b(${locale.keywords.monthly.join('|')})\\b`) : /\bmonthly\b/;
+  // Simple frequency words (no word boundaries for CJK languages)
+  const hourlyPattern = locale ? new RegExp(`(${locale.keywords.hourly.join('|')})`) : /\bhourly\b/;
+  const dailyPattern = locale ? new RegExp(`(${locale.keywords.daily.join('|')})`) : /\bdaily\b/;
+  const weeklyPattern = locale ? new RegExp(`(${locale.keywords.weekly.join('|')})`) : /\bweekly\b/;
+  const monthlyPattern = locale ? new RegExp(`(${locale.keywords.monthly.join('|')})`) : /\bmonthly\b/;
 
   if (hourlyPattern.test(normalizedText) && minuteField === "*") {
     minuteField = "0";
@@ -208,9 +208,9 @@ export function buildCronFields(
     hourField = `${isNaN(hour24) ? "*" : hour24}`;
   }
 
-  // Time keywords
-  const midnightPattern = locale ? new RegExp(`\\b(${locale.keywords.midnight.join('|')})\\b`) : /\bmidnight\b/;
-  const noonPattern = locale ? new RegExp(`\\b(${locale.keywords.noon.join('|')})\\b`) : /\bnoon\b/;
+  // Time keywords (no word boundaries for CJK languages)
+  const midnightPattern = locale ? new RegExp(`(${locale.keywords.midnight.join('|')})`) : /\bmidnight\b/;
+  const noonPattern = locale ? new RegExp(`(${locale.keywords.noon.join('|')})`) : /\bnoon\b/;
 
   if (midnightPattern.test(normalizedText)) {
     minuteField = "0";

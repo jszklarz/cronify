@@ -50,7 +50,7 @@ export interface MatchResults {
 export function detectUnsupportedPatterns(text: string, locale?: LocaleConstants): string | null {
   const weekdayKeys = locale ? Object.keys(locale.weekdays).join('|') : 'monday|tuesday|wednesday|thursday|friday|saturday|sunday';
 
-  const nthWeekdayPattern = new RegExp(`(^|\\s)(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto)\\s+(${weekdayKeys})\\b`);
+  const nthWeekdayPattern = new RegExp(`(^|\\s|)(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto|最后|第一|第二|第三|第四)(\\s+|)(${weekdayKeys})`);
   if (nthWeekdayPattern.test(text)) {
     return "Cron (standard) cannot express 'nth/last weekday of month'. Use RRULE or Quartz.";
   }
@@ -114,9 +114,10 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
     selectedMonths.push(1, 4, 7, 10);
   }
 
-  // Weekdays
+  // Weekdays - handle both word-bounded and non-bounded (for CJK languages)
   const weekdayKeys = Object.keys(weekdays).join('|');
-  const weekdayRegex = new RegExp(`\\b(${weekdayKeys})\\b`, 'g');
+  // Use word boundaries for ASCII, but allow matching without boundaries for CJK
+  const weekdayRegex = new RegExp(`(${weekdayKeys})`, 'g');
   const weekdayMatches = [...normalizedText.matchAll(weekdayRegex)];
 
   if (weekdayMatches.length) {
@@ -135,18 +136,19 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
     );
   }
 
-  // Every N minutes/hours - support both English and Spanish
+  // Every N minutes/hours - support English, Spanish, and Chinese
   const everyPattern = locale ? `(${locale.keywords.every.join('|')})` : 'every';
   const minutePattern = locale ? `(${locale.keywords.minute.join('|')})` : 'minutes?';
   const hourPattern = locale ? `(${locale.keywords.hour.join('|')})` : 'hours?';
 
-  const everyNMinutesPattern = new RegExp(`\\b${everyPattern}\\s+(\\d+)\\s*${minutePattern}\\b`);
+  // Standard pattern with spaces: "every 15 minutes" or "cada 15 minutos"
+  const everyNMinutesPattern = new RegExp(`${everyPattern}\\s*(\\d+)\\s*${minutePattern}`);
   const everyNMinutesMatch = normalizedText.match(everyNMinutesPattern);
   const everyNMinutes = everyNMinutesMatch
     ? Math.max(1, Math.min(59, parseInt(everyNMinutesMatch[2], 10)))
     : null;
 
-  const everyNHoursPattern = new RegExp(`\\b${everyPattern}\\s+(\\d+)\\s*${hourPattern}\\b`);
+  const everyNHoursPattern = new RegExp(`${everyPattern}\\s*(\\d+)\\s*${hourPattern}`);
   const everyNHoursMatch = normalizedText.match(everyNHoursPattern);
   const everyNHours = everyNHoursMatch
     ? Math.max(1, Math.min(23, parseInt(everyNHoursMatch[2], 10)))
@@ -182,13 +184,24 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
     hourWindowRange = `${windowStart}-${windowEnd}`;
   }
 
-  // Specific time(s): "at 5pm", "at 9:30am", "every monday at 9am" or "a las 5pm"
+  // Specific time(s): "at 5pm", "at 9:30am", "every monday at 9am" or "a las 5pm" or "上午9点"
   const atPattern = locale ? `(${locale.keywords.at.join('|')})` : 'at';
-  const timePattern = new RegExp(`\\b${atPattern}\\s+((?:la\\s+)?(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?)\\b`, 'g');
+
+  // Chinese time pattern: catches "上午9点", "下午5点30分", "9点", "零点", "中午", "午夜"
+  const chineseTimePattern = /(零点|午夜|凌晨|中午|正午|(上午|下午)?(\d{1,2})点(\d{1,2})?分?)/g;
+  const chineseTimeMatches = [...normalizedText.matchAll(chineseTimePattern)];
+  const chineseParsedTimes = chineseTimeMatches
+    .map((match) => parseTime(match[0]))
+    .filter(Boolean) as ParsedTime[];
+
+  // Western time pattern
+  const timePattern = new RegExp(`${atPattern}\\s+((?:la\\s+)?(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?)`, 'g');
   const explicitTimePhrases = [...normalizedText.matchAll(timePattern)];
-  const parsedTimes = explicitTimePhrases
+  const westernParsedTimes = explicitTimePhrases
     .map((match) => parseTime(match[2]))
     .filter(Boolean) as ParsedTime[];
+
+  const parsedTimes = [...chineseParsedTimes, ...westernParsedTimes];
 
   return {
     selectedMonths,

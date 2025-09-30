@@ -1,5 +1,6 @@
 import { WEEKDAYS_EN, MONTHS_EN, KEYWORDS_EN } from './en.js';
 import { WEEKDAYS_ES, MONTHS_ES, KEYWORDS_ES } from './es.js';
+import { WEEKDAYS_ZH, MONTHS_ZH, KEYWORDS_ZH } from './zh.js';
 
 export interface LocaleConstants {
   weekdays: Record<string, number>;
@@ -17,6 +18,11 @@ const LOCALES: Record<string, LocaleConstants> = {
     weekdays: WEEKDAYS_ES,
     months: MONTHS_ES,
     keywords: KEYWORDS_ES,
+  },
+  zh: {
+    weekdays: WEEKDAYS_ZH,
+    months: MONTHS_ZH,
+    keywords: KEYWORDS_ZH,
   },
 };
 

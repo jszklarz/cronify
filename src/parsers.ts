@@ -43,6 +43,33 @@ export function to24Hour(hour12: number, ampm?: "am" | "pm"): number {
 export function parseTime(timeString: string): ParsedTime | null {
   const s = timeString.trim();
 
+  // Chinese time format: "上午9点", "下午5点30分", "9点", "零点", "中午", "午夜"
+  // Handle special keywords first
+  if (s.includes('零点') || s.includes('午夜') || s.includes('凌晨')) {
+    return { hour24: 0, minute: 0 };
+  }
+  if (s.includes('中午') || s.includes('正午')) {
+    return { hour24: 12, minute: 0 };
+  }
+
+  const chineseTimeMatch = s.match(/(上午|下午)?(\d{1,2})点(\d{1,2})?分?/);
+  if (chineseTimeMatch) {
+    const period = chineseTimeMatch[1];
+    let hour = parseInt(chineseTimeMatch[2], 10);
+    const minute = chineseTimeMatch[3] ? parseInt(chineseTimeMatch[3], 10) : 0;
+
+    // Handle period markers
+    if (period === '下午' && hour < 12) {
+      hour += 12;
+    } else if (period === '上午' && hour === 12) {
+      hour = 0;
+    }
+
+    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+      return { hour24: hour, minute };
+    }
+  }
+
   const explicitTimeMatch = s.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/);
   if (explicitTimeMatch) {
     const parsedHour = to24Hour(

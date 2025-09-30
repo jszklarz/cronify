@@ -90,6 +90,27 @@ describe('cronned', () => {
     });
   });
 
+  describe('Chinese locale', () => {
+    it.each([
+      { zh: '每周一上午9点', en: 'Every Monday at 9am', expected: ['0 9 * * 1'] },
+      { zh: '每天零点', en: 'Every day at midnight', expected: ['0 0 * * *'] },
+      { zh: '每15分钟', en: 'Every 15 minutes', expected: ['*/15 * * * *'] },
+      { zh: '工作日下午5点', en: 'Weekdays at 5pm', expected: ['0 17 * * 1-5'] },
+      { zh: '周末中午', en: 'Weekend at noon', expected: ['0 12 * * 0,6'] },
+      { zh: '每周五', en: 'Every Friday', expected: ['* * * * 5'] },
+    ])('converts "$zh" ($en)', ({ zh, expected }) => {
+      expect(cronned(zh, 'zh')).toEqual({ crons: expected });
+    });
+
+    it('detects "最后星期五" (last friday)', () => {
+      const result = cronned('最后星期五', 'zh');
+      expect(result).toHaveProperty('unsupported');
+      expect(result).toMatchObject({
+        unsupported: expect.stringContaining('nth/last weekday'),
+      });
+    });
+  });
+
   describe('unsupported patterns', () => {
     it('detects "last friday of the month"', () => {
       const result = cronned('last friday of the month');
