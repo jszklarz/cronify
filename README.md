@@ -207,7 +207,6 @@ MIT
 
 Contributions welcome! Just:
 - Add tests for new features
-- Run `pnpm test` before submitting
 - Keep it simple and focused
 
-Open a PR when ready!
+Tests run automatically on commit via husky. Open a PR when ready!
