@@ -4,8 +4,6 @@
 
 ### Convert natural language to cron expressions
 
-🌍 **Multi-language support** • 🇺🇸 English • 🇪🇸 Spanish • 🇨🇳 Chinese
-
 #### `every monday at 9am` → `0 9 * * 1`
 
 [![npm version](https://img.shields.io/npm/v/@jszkl/cronned.svg)](https://www.npmjs.com/package/@jszkl/cronned)
