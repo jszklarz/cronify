@@ -6,6 +6,8 @@
 
 #### `every monday at 9am` → `0 9 * * 1`
 
+**[Try the live demo →](https://jszklarz.github.io/cronify/)**
+
 </div>
 
 ## Features
@@ -18,17 +20,17 @@
 ## Installation
 
 ```bash
-pnpm add cronify
+npm install @jszkl/cronify
 # or
-yarn add cronify
+pnpm add @jszkl/cronify
 # or
-pnpm add cronify
+yarn add @jszkl/cronify
 ```
 
 ## Quick Start
 
 ```typescript
-import { cronify, cronifyString } from 'cronify';
+import { cronify, cronifyString } from '@jszkl/cronify';
 
 // Using the main function (returns detailed result)
 cronify("every monday at 9am");
