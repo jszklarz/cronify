@@ -16,12 +16,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/cronify.git"
+    "url": "https://github.com/jszklarz/cronify.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/cronify/issues"
+    "url": "https://github.com/jszklarz/cronify/issues"
   },
-  "homepage": "https://github.com/yourusername/cronify#readme",
+  "homepage": "https://github.com/jszklarz/cronify#readme",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
