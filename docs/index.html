@@ -102,6 +102,40 @@
             color: #52525b;
         }
 
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        select {
+            padding: 14px 16px;
+            font-size: 1rem;
+            background: #09090b;
+            color: #e4e4e7;
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: #0c0c0e;
+        }
+
+        select option {
+            background: #18181b;
+            color: #e4e4e7;
+        }
+
         .output {
             margin-top: 30px;
             padding: 20px;
@@ -235,14 +269,23 @@
     <h1 class="hero-title">cronned</h1>
 
     <div class="container">
-        <div>
-            <label for="input">Enter a schedule in plain English</label>
-            <input
-                type="text"
-                id="input"
-                placeholder="every monday at 9am"
-                autocomplete="off"
-            >
+        <div class="input-row">
+            <div class="input-group">
+                <label for="input">Enter a schedule</label>
+                <input
+                    type="text"
+                    id="input"
+                    placeholder="every monday at 9am"
+                    autocomplete="off"
+                >
+            </div>
+            <div>
+                <label for="locale">Language</label>
+                <select id="locale">
+                    <option value="en">en</option>
+                    <option value="es">es</option>
+                </select>
+            </div>
         </div>
 
         <div class="output">
@@ -289,9 +332,37 @@
         const input = document.getElementById('input');
         const output = document.getElementById('output');
         const errorOutput = document.getElementById('error-output');
+        const localeSelect = document.getElementById('locale');
+
+        const placeholders = {
+            en: 'every monday at 9am',
+            es: 'cada lunes a las 9am'
+        };
+
+        const examples = {
+            en: [
+                'every monday at 9am',
+                'every weekday at 5pm',
+                'every 15 minutes',
+                'daily at midnight',
+                'on the 1st and 15th at noon',
+                'every hour between 9am and 5pm',
+                'last friday of the month'
+            ],
+            es: [
+                'cada lunes a las 9am',
+                'cada día laborable a las 5pm',
+                'cada 15 minutos',
+                'diariamente a medianoche',
+                'cada fin de semana a mediodía',
+                'cada hora entre las 9am y 5pm',
+                'último viernes del mes'
+            ]
+        };
 
         function updateCron() {
             const value = input.value.trim();
+            const locale = localeSelect.value;
 
             if (!value) {
                 output.innerHTML = '<span style="color: #52525b;">Type something above...</span>';
@@ -300,7 +371,7 @@
             }
 
             try {
-                const result = cronned(value);
+                const result = cronned(value, locale);
 
                 if ('unsupported' in result) {
                     output.innerHTML = '<span style="color: #52525b;">? ? ? ? ?</span>';
@@ -316,7 +387,28 @@
             }
         }
 
+        function updateLocale() {
+            const locale = localeSelect.value;
+            input.placeholder = placeholders[locale];
+            updateExamples();
+            if (input.value.trim()) {
+                updateCron();
+            }
+        }
+
+        function updateExamples() {
+            const locale = localeSelect.value;
+            const exampleChips = document.querySelectorAll('.example-chip');
+            examples[locale].forEach((example, i) => {
+                if (exampleChips[i]) {
+                    exampleChips[i].textContent = example + (i === 6 ? ' ❌' : '');
+                    exampleChips[i].dataset.example = example;
+                }
+            });
+        }
+
         input.addEventListener('input', updateCron);
+        localeSelect.addEventListener('change', updateLocale);
 
         // Example chips
         document.querySelectorAll('.example-chip').forEach(chip => {

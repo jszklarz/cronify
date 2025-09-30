@@ -3,51 +3,27 @@ import { cronned } from './index';
 
 describe('cronned', () => {
   describe('basic schedules', () => {
-    it('converts "every monday at 9am"', () => {
-      const result = cronned('every monday at 9am');
-      expect(result).toEqual({ crons: ['0 9 * * 1'] });
-    });
-
-    it('converts "every day at midnight"', () => {
-      const result = cronned('every day at midnight');
-      expect(result).toEqual({ crons: ['0 0 * * *'] });
-    });
-
-    it('converts "daily at 9:30am"', () => {
-      const result = cronned('daily at 9:30am');
-      expect(result).toEqual({ crons: ['30 9 * * *'] });
-    });
-
-    it('converts "hourly"', () => {
-      const result = cronned('hourly');
-      expect(result).toEqual({ crons: ['0 * * * *'] });
-    });
-
-    it('converts "every 15 minutes"', () => {
-      const result = cronned('every 15 minutes');
-      expect(result).toEqual({ crons: ['*/15 * * * *'] });
-    });
-
-    it('converts "every 2 hours"', () => {
-      const result = cronned('every 2 hours');
-      expect(result).toEqual({ crons: ['0 */2 * * *'] });
+    it.each([
+      { en: 'every monday at 9am', es: 'cada lunes a las 9am', expected: ['0 9 * * 1'] },
+      { en: 'every day at midnight', es: 'cada día a medianoche', expected: ['0 0 * * *'] },
+      { en: 'daily at 9:30am', es: 'diariamente a las 9:30am', expected: ['30 9 * * *'] },
+      { en: 'hourly', es: 'cada hora', expected: ['0 * * * *'] },
+      { en: 'every 15 minutes', es: 'cada 15 minutos', expected: ['*/15 * * * *'] },
+      { en: 'every 2 hours', es: 'cada 2 horas', expected: ['0 */2 * * *'] },
+    ])('converts "$en" and "$es"', ({ en, es, expected }) => {
+      expect(cronned(en)).toEqual({ crons: expected });
+      expect(cronned(es, 'es')).toEqual({ crons: expected });
     });
   });
 
   describe('weekdays', () => {
-    it('converts "every weekday at 9am"', () => {
-      const result = cronned('every weekday at 9am');
-      expect(result).toEqual({ crons: ['0 9 * * 1-5'] });
-    });
-
-    it('converts "every weekend at noon"', () => {
-      const result = cronned('every weekend at noon');
-      expect(result).toEqual({ crons: ['0 12 * * 0,6'] });
-    });
-
-    it('converts "every monday and friday at 5pm"', () => {
-      const result = cronned('every monday and friday at 5pm');
-      expect(result).toEqual({ crons: ['0 17 * * 1,5'] });
+    it.each([
+      { en: 'every weekday at 9am', es: 'cada día laborable a las 9am', expected: ['0 9 * * 1-5'] },
+      { en: 'every weekend at noon', es: 'cada fin de semana a mediodía', expected: ['0 12 * * 0,6'] },
+      { en: 'every monday and friday at 5pm', es: 'cada lunes y viernes a las 5pm', expected: ['0 17 * * 1,5'] },
+    ])('converts "$en" and "$es"', ({ en, es, expected }) => {
+      expect(cronned(en)).toEqual({ crons: expected });
+      expect(cronned(es, 'es')).toEqual({ crons: expected });
     });
 
     it('converts "every tuesday at 9am"', () => {

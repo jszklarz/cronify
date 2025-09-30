@@ -48,6 +48,26 @@ if ("crons" in result) {
 } else {
   console.error(result.unsupported); // Error message
 }
+
+// Spanish support! 🇪🇸
+cronned("cada lunes a las 9am", "es");
+// => { crons: ["0 9 * * 1"] }
+```
+
+## Multi-Language Support
+
+cronned supports multiple languages! Currently available:
+- 🇺🇸 **English** (default)
+- 🇪🇸 **Spanish**
+
+```typescript
+// English
+cronned("every weekday at 9am")
+// => { crons: ["0 9 * * 1-5"] }
+
+// Spanish
+cronned("cada día laborable a las 9am", "es")
+// => { crons: ["0 9 * * 1-5"] }
 ```
 
 ## Examples

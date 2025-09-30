@@ -1,4 +1,5 @@
 import type { MatchResults } from "./matchers.js";
+import type { LocaleConstants } from "./locales/index.js";
 
 /**
  * Converts a list of numbers to a cron field expression.
@@ -62,6 +63,7 @@ export interface CronFields {
  *
  * @param normalizedText - Lowercased, normalized input text (for pattern matching)
  * @param matches - Extracted scheduling components from pattern matching
+ * @param locale - Optional locale constants for locale-specific keyword matching
  * @returns Object with five cron field strings
  *
  * @example
@@ -77,6 +79,7 @@ export interface CronFields {
 export function buildCronFields(
   normalizedText: string,
   matches: MatchResults,
+  locale?: LocaleConstants,
 ): CronFields {
   let minuteField: string = "*";
   let hourField: string = "*";
@@ -84,14 +87,22 @@ export function buildCronFields(
   let monthField: string = "*";
   let dayOfWeekField: string = "*";
 
+  // Build locale-aware regex patterns
+  const weekdayPattern = locale
+    ? new RegExp(`\\b(${locale.keywords.weekday.join('|')})\\b`)
+    : /\bweekdays?\b/;
+  const weekendPattern = locale
+    ? new RegExp(`\\b(${locale.keywords.weekend.join('|')})\\b`)
+    : /\bweekends?\b/;
+
   // Months
   if (matches.selectedMonths.length) {
     monthField = listToCron(matches.selectedMonths, 12);
   }
 
   // Weekdays
-  if (/\bweekdays?\b/.test(normalizedText)) dayOfWeekField = "1-5";
-  if (/\bweekends?\b/.test(normalizedText)) dayOfWeekField = "0,6";
+  if (weekdayPattern.test(normalizedText)) dayOfWeekField = "1-5";
+  if (weekendPattern.test(normalizedText)) dayOfWeekField = "0,6";
   if (matches.selectedWeekdays.length) {
     dayOfWeekField = listToCron(matches.selectedWeekdays, 7);
   }
@@ -111,28 +122,41 @@ export function buildCronFields(
   }
 
   // Simple recurring patterns without numbers
-  if (/\bevery\s+minute\b/.test(normalizedText)) {
+  const everyPattern = locale ? `(${locale.keywords.every.join('|')})` : 'every';
+  const minuteKeywordPattern = locale ? `(${locale.keywords.minute.join('|')})` : 'minute';
+  const hourKeywordPattern = locale ? `(${locale.keywords.hour.join('|')})` : 'hour';
+  const dayKeywordPattern = locale ? `(${locale.keywords.day.join('|')})` : 'day';
+  const weekKeywordPattern = locale ? `(${locale.keywords.week.join('|')})` : 'week';
+  const monthKeywordPattern = locale ? `(${locale.keywords.month.join('|')})` : 'month';
+
+  const everyMinutePattern = new RegExp(`\\b${everyPattern}\\s+${minuteKeywordPattern}\\b`);
+  const everyHourPattern = new RegExp(`\\b${everyPattern}\\s+${hourKeywordPattern}\\b`);
+  const everyDayPattern = new RegExp(`\\b${everyPattern}\\s+${dayKeywordPattern}\\b`);
+  const everyWeekPattern = new RegExp(`\\b${everyPattern}\\s+${weekKeywordPattern}\\b`);
+  const everyMonthPattern = new RegExp(`\\b${everyPattern}\\s+${monthKeywordPattern}\\b`);
+
+  if (everyMinutePattern.test(normalizedText)) {
     minuteField = "*";
     hourField = "*";
   }
-  if (/\bevery\s+hour\b/.test(normalizedText)) {
+  if (everyHourPattern.test(normalizedText)) {
     minuteField = "0";
     hourField = "*";
   }
-  if (/\bevery\s+day\b/.test(normalizedText)) {
+  if (everyDayPattern.test(normalizedText)) {
     if (hourField === "*" && minuteField === "*") {
       minuteField = "0";
       hourField = "0";
     }
   }
-  if (/\bevery\s+week\b/.test(normalizedText)) {
+  if (everyWeekPattern.test(normalizedText)) {
     if (hourField === "*" && minuteField === "*") {
       minuteField = "0";
       hourField = "0";
     }
     dayOfWeekField = "0";
   }
-  if (/\bevery\s+month\b/.test(normalizedText)) {
+  if (everyMonthPattern.test(normalizedText)) {
     if (hourField === "*" && minuteField === "*") {
       minuteField = "0";
       hourField = "0";
@@ -141,24 +165,29 @@ export function buildCronFields(
   }
 
   // Simple frequency words
-  if (/\bhourly\b/.test(normalizedText) && minuteField === "*") {
+  const hourlyPattern = locale ? new RegExp(`\\b(${locale.keywords.hourly.join('|')})\\b`) : /\bhourly\b/;
+  const dailyPattern = locale ? new RegExp(`\\b(${locale.keywords.daily.join('|')})\\b`) : /\bdaily\b/;
+  const weeklyPattern = locale ? new RegExp(`\\b(${locale.keywords.weekly.join('|')})\\b`) : /\bweekly\b/;
+  const monthlyPattern = locale ? new RegExp(`\\b(${locale.keywords.monthly.join('|')})\\b`) : /\bmonthly\b/;
+
+  if (hourlyPattern.test(normalizedText) && minuteField === "*") {
     minuteField = "0";
     hourField = "*";
   }
-  if (/\bdaily\b/.test(normalizedText)) {
+  if (dailyPattern.test(normalizedText)) {
     if (hourField === "*" && minuteField === "*") {
       minuteField = "0";
       hourField = "0";
     }
   }
-  if (/\bweekly\b/.test(normalizedText)) {
+  if (weeklyPattern.test(normalizedText)) {
     if (hourField === "*" && minuteField === "*") {
       minuteField = "0";
       hourField = "0";
     }
     dayOfWeekField = "0";
   }
-  if (/\bmonthly\b/.test(normalizedText)) {
+  if (monthlyPattern.test(normalizedText)) {
     if (hourField === "*" && minuteField === "*") {
       minuteField = "0";
       hourField = "0";
@@ -180,24 +209,30 @@ export function buildCronFields(
   }
 
   // Time keywords
-  if (/\bmidnight\b/.test(normalizedText)) {
+  const midnightPattern = locale ? new RegExp(`\\b(${locale.keywords.midnight.join('|')})\\b`) : /\bmidnight\b/;
+  const noonPattern = locale ? new RegExp(`\\b(${locale.keywords.noon.join('|')})\\b`) : /\bnoon\b/;
+
+  if (midnightPattern.test(normalizedText)) {
     minuteField = "0";
     hourField = "0";
   }
-  if (/\bnoon\b/.test(normalizedText)) {
+  if (noonPattern.test(normalizedText)) {
     minuteField = "0";
     hourField = "12";
   }
 
   // Windows + cadence
+  const everyMinutesWindowPattern = new RegExp(`\\b${everyPattern}\\s+(\\d+)\\s*${minuteKeywordPattern}\\b`);
+  const everyHourWindowPattern = new RegExp(`${everyPattern}\\s+${hourKeywordPattern}|${hourlyPattern.source}`);
+
   if (
     matches.hourWindowRange &&
-    /\bevery\s+(\d+)\s*minutes?\b/.test(normalizedText)
+    everyMinutesWindowPattern.test(normalizedText)
   ) {
     hourField = matches.hourWindowRange;
   } else if (
     matches.hourWindowRange &&
-    /every\s+hour|hourly/.test(normalizedText)
+    everyHourWindowPattern.test(normalizedText)
   ) {
     hourField = matches.hourWindowRange;
   } else if (

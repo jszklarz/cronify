@@ -1,0 +1,72 @@
+export const WEEKDAYS_ES: Record<string, number> = {
+  domingo: 0,
+  domingos: 0, // plural
+  dom: 0,
+  lunes: 1,
+  lun: 1,
+  martes: 2,
+  mar: 2,
+  miércoles: 3,
+  miercoles: 3, // without accent
+  mié: 3,
+  mie: 3,
+  jueves: 4,
+  jue: 4,
+  viernes: 5,
+  vie: 5,
+  sábado: 6,
+  sábados: 6, // plural
+  sabado: 6, // without accent
+  sabados: 6, // plural without accent
+  sáb: 6,
+  sab: 6,
+};
+
+export const MONTHS_ES: Record<string, number> = {
+  enero: 1,
+  ene: 1,
+  febrero: 2,
+  feb: 2,
+  marzo: 3,
+  mar: 3,
+  abril: 4,
+  abr: 4,
+  mayo: 5,
+  may: 5,
+  junio: 6,
+  jun: 6,
+  julio: 7,
+  jul: 7,
+  agosto: 8,
+  ago: 8,
+  septiembre: 9,
+  sep: 9,
+  sept: 9,
+  octubre: 10,
+  oct: 10,
+  noviembre: 11,
+  nov: 11,
+  diciembre: 12,
+  dic: 12,
+};
+
+export const KEYWORDS_ES = {
+  every: ['cada', 'todos los', 'todas las'],
+  at: ['a las', 'a la'],
+  between: ['entre'],
+  and: ['y'],
+  hourly: ['cada hora'],
+  daily: ['diariamente', 'cada día', 'cada dia'],
+  weekly: ['semanalmente', 'cada semana'],
+  monthly: ['mensualmente', 'cada mes'],
+  quarterly: ['trimestralmente', 'cada trimestre'],
+  weekday: ['día laborable', 'dia laborable', 'días laborables', 'dias laborables'],
+  weekend: ['fin de semana', 'fines de semana'],
+  midnight: ['medianoche'],
+  noon: ['mediodía', 'mediodia'],
+  minute: ['minuto', 'minutos'],
+  hour: ['hora', 'horas'],
+  day: ['día', 'dia', 'días', 'dias'],
+  week: ['semana', 'semanas'],
+  month: ['mes', 'meses'],
+};

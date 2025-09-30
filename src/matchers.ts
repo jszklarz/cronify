@@ -1,6 +1,7 @@
 import { WEEKDAYS, MONTHS } from "./constants.js";
 import { parseTime, to24Hour } from "./parsers.js";
 import type { ParsedTime } from "./types.js";
+import type { LocaleConstants } from "./locales/index.js";
 
 /**
  * Results from pattern matching against the input text.
@@ -34,6 +35,7 @@ export interface MatchResults {
  * - Last day of month detection
  *
  * @param text - Normalized input text to check
+ * @param locale - Optional locale constants for locale-specific pattern matching
  * @returns Error message if unsupported pattern found, null otherwise
  *
  * @example
@@ -45,20 +47,22 @@ export interface MatchResults {
  * // => null
  * ```
  */
-export function detectUnsupportedPatterns(text: string): string | null {
-  if (
-    /\b(last|nth|first|second|third|fourth)\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/.test(
-      text,
-    )
-  ) {
+export function detectUnsupportedPatterns(text: string, locale?: LocaleConstants): string | null {
+  const weekdayKeys = locale ? Object.keys(locale.weekdays).join('|') : 'monday|tuesday|wednesday|thursday|friday|saturday|sunday';
+
+  const nthWeekdayPattern = new RegExp(`\\b(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto)\\s+(${weekdayKeys})\\b`);
+  if (nthWeekdayPattern.test(text)) {
     return "Cron (standard) cannot express 'nth/last weekday of month'. Use RRULE or Quartz.";
   }
-  if (/\bbusiness\s*days?\b/.test(text)) {
+
+  if (/\b(business\s*days?)\b/.test(text)) {
     return "'Business days' and holiday calendars are beyond plain cron. Use RRULE + calendar exceptions.";
   }
-  if (/\b(last\s+day\s+of\s+the\s+month|eom|end\s+of\s+month)\b/.test(text)) {
+
+  if (/\b(last\s+day\s+of\s+the\s+month|eom|end\s+of\s+month|último\s+día\s+del\s+mes|fin\s+de\s+mes)\b/.test(text)) {
     return "'Last day of month' is not in standard cron. Use Quartz L or emit 28-31 with guard logic.";
   }
+
   return null;
 }
 
@@ -88,19 +92,22 @@ export function detectUnsupportedPatterns(text: string): string | null {
  * // }
  * ```
  */
-export function matchPatterns(normalizedText: string): MatchResults {
+export function matchPatterns(normalizedText: string, locale?: LocaleConstants): MatchResults {
+  const weekdays = locale?.weekdays ?? WEEKDAYS;
+  const months = locale?.months ?? MONTHS;
+
   const selectedMonths: number[] = [];
   const selectedWeekdays: number[] = [];
   const selectedMonthDays: number[] = [];
 
   // Months (e.g., "in aug", "every jan and feb")
-  for (const monthKey of Object.keys(MONTHS)) {
+  for (const monthKey of Object.keys(months)) {
     if (
       normalizedText.includes(` ${monthKey} `) ||
       normalizedText.endsWith(` ${monthKey}`) ||
       normalizedText.startsWith(`${monthKey} `)
     ) {
-      selectedMonths.push(MONTHS[monthKey]);
+      selectedMonths.push(months[monthKey]);
     }
   }
   if (/\bquarter(ly)?\b/.test(normalizedText)) {
@@ -108,13 +115,13 @@ export function matchPatterns(normalizedText: string): MatchResults {
   }
 
   // Weekdays
-  const weekdayRegex =
-    /\b(sun|mon|tue|tues|wed|thu|thurs|fri|sat|sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/g;
+  const weekdayKeys = Object.keys(weekdays).join('|');
+  const weekdayRegex = new RegExp(`\\b(${weekdayKeys})\\b`, 'g');
   const weekdayMatches = [...normalizedText.matchAll(weekdayRegex)];
 
   if (weekdayMatches.length) {
     weekdayMatches.forEach((match) =>
-      selectedWeekdays.push(WEEKDAYS[match[1]]),
+      selectedWeekdays.push(weekdays[match[1]]),
     );
   }
 
@@ -128,17 +135,21 @@ export function matchPatterns(normalizedText: string): MatchResults {
     );
   }
 
-  // Every N minutes/hours
-  const everyNMinutesMatch = normalizedText.match(
-    /\bevery\s+(\d+)\s*minutes?\b/,
-  );
+  // Every N minutes/hours - support both English and Spanish
+  const everyPattern = locale ? `(${locale.keywords.every.join('|')})` : 'every';
+  const minutePattern = locale ? `(${locale.keywords.minute.join('|')})` : 'minutes?';
+  const hourPattern = locale ? `(${locale.keywords.hour.join('|')})` : 'hours?';
+
+  const everyNMinutesPattern = new RegExp(`\\b${everyPattern}\\s+(\\d+)\\s*${minutePattern}\\b`);
+  const everyNMinutesMatch = normalizedText.match(everyNMinutesPattern);
   const everyNMinutes = everyNMinutesMatch
-    ? Math.max(1, Math.min(59, parseInt(everyNMinutesMatch[1], 10)))
+    ? Math.max(1, Math.min(59, parseInt(everyNMinutesMatch[2], 10)))
     : null;
 
-  const everyNHoursMatch = normalizedText.match(/\bevery\s+(\d+)\s*hours?\b/);
+  const everyNHoursPattern = new RegExp(`\\b${everyPattern}\\s+(\\d+)\\s*${hourPattern}\\b`);
+  const everyNHoursMatch = normalizedText.match(everyNHoursPattern);
   const everyNHours = everyNHoursMatch
-    ? Math.max(1, Math.min(23, parseInt(everyNHoursMatch[1], 10)))
+    ? Math.max(1, Math.min(23, parseInt(everyNHoursMatch[2], 10)))
     : null;
 
   // "at :mm past every hour"
@@ -149,31 +160,34 @@ export function matchPatterns(normalizedText: string): MatchResults {
     ? parseInt(atPastEachHourMatch[1], 10)
     : null;
 
-  // Time windows: "between 9am and 5pm"
-  const betweenWindowMatch = normalizedText.match(
-    /\bbetween\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s+and\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/,
+  // Time windows: "between 9am and 5pm" or "entre las 9am y 5pm"
+  const betweenPattern = locale ? `(${locale.keywords.between.join('|')})` : 'between';
+  const andPattern = locale ? `(${locale.keywords.and.join('|')})` : 'and';
+  const betweenWindowPattern = new RegExp(
+    `\\b${betweenPattern}\\s+(?:las\\s+)?(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?\\s+${andPattern}\\s+(?:las\\s+)?(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?\\b`
   );
+  const betweenWindowMatch = normalizedText.match(betweenWindowPattern);
   let hourWindowRange: string | null = null;
   if (betweenWindowMatch) {
     const startHour = to24Hour(
-      parseInt(betweenWindowMatch[1], 10),
-      betweenWindowMatch[3] as "am" | "pm" | undefined,
+      parseInt(betweenWindowMatch[2], 10),
+      betweenWindowMatch[4] as "am" | "pm" | undefined,
     );
     const endHour = to24Hour(
-      parseInt(betweenWindowMatch[4], 10),
-      betweenWindowMatch[6] as "am" | "pm" | undefined,
+      parseInt(betweenWindowMatch[6], 10),
+      betweenWindowMatch[8] as "am" | "pm" | undefined,
     );
     const windowStart = Math.min(startHour, endHour);
     const windowEnd = Math.max(startHour, endHour);
     hourWindowRange = `${windowStart}-${windowEnd}`;
   }
 
-  // Specific time(s): "at 5pm", "at 9:30am", "every monday at 9am"
-  const explicitTimePhrases = [
-    ...normalizedText.matchAll(/\bat\s+((\d{1,2})(?::(\d{2}))?\s*(am|pm)?)\b/g),
-  ];
+  // Specific time(s): "at 5pm", "at 9:30am", "every monday at 9am" or "a las 5pm"
+  const atPattern = locale ? `(${locale.keywords.at.join('|')})` : 'at';
+  const timePattern = new RegExp(`\\b${atPattern}\\s+((?:la\\s+)?(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?)\\b`, 'g');
+  const explicitTimePhrases = [...normalizedText.matchAll(timePattern)];
   const parsedTimes = explicitTimePhrases
-    .map((match) => parseTime(match[1]))
+    .map((match) => parseTime(match[2]))
     .filter(Boolean) as ParsedTime[];
 
   return {
