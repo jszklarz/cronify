@@ -1,8 +1,12 @@
 ![cronify](.github/assets/cronify_banner.png)
 
-🕐 **Convert natural language to cron expressions**
+<div align="center">
 
-Write "every monday at 9am" and get `0 9 * * 1`. Build scheduling UIs without making users learn cron syntax.
+### Convert natural language to cron expressions
+
+## "every monday at 9am" → `0 9 * * 1`
+
+</div>
 
 ## Features
 
