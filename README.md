@@ -8,7 +8,6 @@
 
 [![npm version](https://img.shields.io/npm/v/@jszkl/cronify.svg)](https://www.npmjs.com/package/@jszkl/cronify)
 [![Tests](https://github.com/jszklarz/cronify/actions/workflows/publish.yml/badge.svg)](https://github.com/jszklarz/cronify/actions/workflows/publish.yml)
-[![npm downloads](https://img.shields.io/npm/dm/@jszkl/cronify.svg)](https://www.npmjs.com/package/@jszkl/cronify)
 
 **[Try the live demo →](https://jszklarz.github.io/cronify/)**
 
