@@ -50,7 +50,7 @@ export interface MatchResults {
 export function detectUnsupportedPatterns(text: string, locale?: LocaleConstants): string | null {
   const weekdayKeys = locale ? Object.keys(locale.weekdays).join('|') : 'monday|tuesday|wednesday|thursday|friday|saturday|sunday';
 
-  const nthWeekdayPattern = new RegExp(`(^|\\s|)(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto|最后|第一|第二|第三|第四)(\\s+|)(${weekdayKeys})`);
+  const nthWeekdayPattern = new RegExp(`(^|\\s|)(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto|最后|第一|第二|第三|第四)(一个|个)?(\\s+|)(${weekdayKeys})`);
   if (nthWeekdayPattern.test(text)) {
     return "Cron (standard) cannot express 'nth/last weekday of month'. Use RRULE or Quartz.";
   }
@@ -187,12 +187,31 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
   // Specific time(s): "at 5pm", "at 9:30am", "every monday at 9am" or "a las 5pm" or "上午9点"
   const atPattern = locale ? `(${locale.keywords.at.join('|')})` : 'at';
 
-  // Chinese time pattern: catches "上午9点", "下午5点30分", "9点", "零点", "中午", "午夜"
-  const chineseTimePattern = /(零点|午夜|凌晨|中午|正午|(上午|下午)?(\d{1,2})点(\d{1,2})?分?)/g;
-  const chineseTimeMatches = [...normalizedText.matchAll(chineseTimePattern)];
-  const chineseParsedTimes = chineseTimeMatches
-    .map((match) => parseTime(match[0]))
-    .filter(Boolean) as ParsedTime[];
+  // Chinese time pattern: catches "上午9点", "下午5点30分", "晚上8点", "9点半", "零点", "中午", "午夜"
+  // Priority: explicit time with digits first, then standalone keywords
+  const chineseExplicitTimePattern = /(上午|下午|晚上|傍晚|夜间|早上)?(\d{1,2})点(半|(\d{1,2})分?)?/g;
+  const chineseKeywordTimePattern = /(零点|午夜|凌晨|中午|正午)/g;
+
+  const explicitMatches = [...normalizedText.matchAll(chineseExplicitTimePattern)];
+  const keywordMatches = [...normalizedText.matchAll(chineseKeywordTimePattern)];
+
+  // Only use keyword matches if no explicit time was found nearby (within 4 chars)
+  // This prevents duplicates like "中午12点半" matching both "中午" and "12点半"
+  const filteredKeywords = keywordMatches.filter(kwMatch => {
+    return !explicitMatches.some(exMatch => {
+      const kwStart = kwMatch.index!;
+      const kwEnd = kwStart + kwMatch[0].length;
+      const exStart = exMatch.index!;
+      const exEnd = exStart + exMatch[0].length;
+      // Check if ranges overlap or are within 2 chars of each other
+      return (kwStart <= exEnd + 2 && kwEnd >= exStart - 2);
+    });
+  });
+
+  const chineseParsedTimes = [
+    ...explicitMatches.map(m => parseTime(m[0])),
+    ...filteredKeywords.map(m => parseTime(m[0]))
+  ].filter(Boolean) as ParsedTime[];
 
   // Western time pattern
   const timePattern = new RegExp(`${atPattern}\\s+((?:la\\s+)?(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?)`, 'g');

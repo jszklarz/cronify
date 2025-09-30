@@ -209,16 +209,19 @@ export function buildCronFields(
   }
 
   // Time keywords (no word boundaries for CJK languages)
-  const midnightPattern = locale ? new RegExp(`(${locale.keywords.midnight.join('|')})`) : /\bmidnight\b/;
-  const noonPattern = locale ? new RegExp(`(${locale.keywords.noon.join('|')})`) : /\bnoon\b/;
+  // Only apply if no explicit time was already parsed
+  if (matches.parsedTimes.length === 0) {
+    const midnightPattern = locale ? new RegExp(`(${locale.keywords.midnight.join('|')})`) : /\bmidnight\b/;
+    const noonPattern = locale ? new RegExp(`(${locale.keywords.noon.join('|')})`) : /\bnoon\b/;
 
-  if (midnightPattern.test(normalizedText)) {
-    minuteField = "0";
-    hourField = "0";
-  }
-  if (noonPattern.test(normalizedText)) {
-    minuteField = "0";
-    hourField = "12";
+    if (midnightPattern.test(normalizedText)) {
+      minuteField = "0";
+      hourField = "0";
+    }
+    if (noonPattern.test(normalizedText)) {
+      minuteField = "0";
+      hourField = "12";
+    }
   }
 
   // Windows + cadence

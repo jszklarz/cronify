@@ -92,7 +92,8 @@ export function cronned(input: string, locale: string = "en"): CronResult {
       ({ hour24, minute }) =>
         `${minute} ${isNaN(hour24) ? "*" : hour24} ${fields.dayOfMonth} ${fields.month} ${fields.dayOfWeek}`,
     );
-    return { crons };
+    // Deduplicate identical cron expressions
+    return { crons: [...new Set(crons)] };
   }
 
   // Build cron fields

@@ -43,7 +43,7 @@ export function to24Hour(hour12: number, ampm?: "am" | "pm"): number {
 export function parseTime(timeString: string): ParsedTime | null {
   const s = timeString.trim();
 
-  // Chinese time format: "上午9点", "下午5点30分", "9点", "零点", "中午", "午夜"
+  // Chinese time format: "上午9点", "下午5点30分", "晚上8点", "9点", "零点", "中午", "午夜"
   // Handle special keywords first
   if (s.includes('零点') || s.includes('午夜') || s.includes('凌晨')) {
     return { hour24: 0, minute: 0 };
@@ -52,16 +52,18 @@ export function parseTime(timeString: string): ParsedTime | null {
     return { hour24: 12, minute: 0 };
   }
 
-  const chineseTimeMatch = s.match(/(上午|下午)?(\d{1,2})点(\d{1,2})?分?/);
+  // Match time with period markers, including 点半 (half past)
+  const chineseTimeMatch = s.match(/(上午|下午|晚上|傍晚|夜间|早上)?(\d{1,2})点(半|(\d{1,2})分?)?/);
   if (chineseTimeMatch) {
     const period = chineseTimeMatch[1];
     let hour = parseInt(chineseTimeMatch[2], 10);
-    const minute = chineseTimeMatch[3] ? parseInt(chineseTimeMatch[3], 10) : 0;
+    const isBan = chineseTimeMatch[3] === '半'; // 点半 = :30
+    const minute = isBan ? 30 : (chineseTimeMatch[4] ? parseInt(chineseTimeMatch[4], 10) : 0);
 
     // Handle period markers
-    if (period === '下午' && hour < 12) {
+    if ((period === '下午' || period === '晚上' || period === '傍晚' || period === '夜间') && hour < 12) {
       hour += 12;
-    } else if (period === '上午' && hour === 12) {
+    } else if ((period === '上午' || period === '早上') && hour === 12) {
       hour = 0;
     }
 
