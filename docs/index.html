@@ -17,10 +17,34 @@
             color: #e4e4e7;
             background: #09090b;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 30px;
+        }
+
+        .hero-title {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #a78bfa, #818cf8, #c084fc, #e879f9, #818cf8, #a78bfa);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 8s ease infinite;
+            margin: 0;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .container {
@@ -184,6 +208,10 @@
         }
 
         @media (max-width: 640px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
             .container {
                 padding: 24px;
             }
@@ -195,10 +223,9 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>cronify</h1>
-        <p class="subtitle">Convert natural language to cron expressions</p>
+    <h1 class="hero-title">cronify</h1>
 
+    <div class="container">
         <div>
             <label for="input">Enter a schedule in plain English</label>
             <input
