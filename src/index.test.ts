@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cronify, cronifyString } from './index';
+import { cronify } from './index';
 
 describe('cronify', () => {
   describe('basic schedules', () => {
@@ -163,19 +163,3 @@ describe('cronify', () => {
   });
 });
 
-describe('cronifyString', () => {
-  it('returns cron string for valid input', () => {
-    const result = cronifyString('every monday at 9am');
-    expect(result).toBe('0 9 * * 1');
-  });
-
-  it('returns null for unsupported patterns', () => {
-    const result = cronifyString('last friday of the month');
-    expect(result).toBeNull();
-  });
-
-  it('returns first cron when multiple are generated', () => {
-    const result = cronifyString('at 9am and 5pm');
-    expect(result).toBe('0 9 * * *');
-  });
-});

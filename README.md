@@ -34,15 +34,17 @@ yarn add @jszkl/cronify
 ## Quick Start
 
 ```typescript
-import { cronify, cronifyString } from '@jszkl/cronify';
+import { cronify } from '@jszkl/cronify';
 
-// Using the main function (returns detailed result)
-cronify("every monday at 9am");
+const result = cronify("every monday at 9am");
 // => { crons: ["0 9 * * 1"] }
 
-// Using the simple wrapper (returns string or null)
-cronifyString("every monday at 9am");
-// => "0 9 * * 1"
+// Check if conversion succeeded
+if ("crons" in result) {
+  console.log(result.crons[0]); // "0 9 * * 1"
+} else {
+  console.error(result.unsupported); // Error message
+}
 ```
 
 ## Examples
@@ -137,23 +139,43 @@ cronify("last day of the month")
 
 ### `cronify(input: string): CronResult`
 
-Convert natural language to cron expression(s). Returns an object with either:
-- `{ crons: string[] }` - Array of cron expressions
-- `{ unsupported: string }` - Error message for unsupported patterns
+Convert natural language to cron expression(s). Returns a discriminated union:
+
+```typescript
+type CronResult =
+  | { crons: string[]; note?: string }
+  | { unsupported: string }
+```
 
 **Parameters:**
 - `input` - Natural language schedule description
 
-**Returns:** `CronResult`
+**Returns:** `CronResult` - Either success with `crons` array or `unsupported` error message
 
-### `cronifyString(input: string): string | null`
+**Example:**
+```typescript
+const result = cronify("every monday at 9am");
+if ("crons" in result) {
+  // Success: result.crons is string[]
+  console.log(result.crons[0]);
+} else {
+  // Unsupported: result.unsupported is string
+  console.error(result.unsupported);
+}
+```
 
-Simplified wrapper that returns a single cron string or null. If the input generates multiple cron expressions, returns the first one.
+### Migration from v0.1.x
 
-**Parameters:**
-- `input` - Natural language schedule description
+The `cronifyString` function has been removed in v0.2.0 for better future-proofing. Migration is simple:
 
-**Returns:** Cron expression string or `null` if unsupported
+```typescript
+// Before (v0.1.x)
+const cron = cronifyString("every monday at 9am");
+
+// After (v0.2.0+)
+const result = cronify("every monday at 9am");
+const cron = "crons" in result ? result.crons[0] : null;
+```
 
 ## Cron Format
 

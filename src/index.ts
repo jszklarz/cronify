@@ -69,31 +69,5 @@ export function cronify(input: string): CronResult {
   return { crons: [compiledCron] };
 }
 
-/**
- * Simplified wrapper that returns a single cron string or null.
- * If the input generates multiple cron expressions, returns the first one.
- *
- * @param input - Natural language schedule description
- * @returns Cron expression string or null if unsupported
- *
- * @example
- * ```typescript
- * cronifyString("every monday at 9am")
- * // => "0 9 * * 1"
- *
- * cronifyString("last friday of the month")
- * // => null
- * ```
- */
-export function cronifyString(input: string): string | null {
-  try {
-    const result = cronify(input);
-    if ("unsupported" in result) return null;
-    return result.crons[0] ?? null;
-  } catch {
-    return null;
-  }
-}
-
 // Export types
 export type { CronResult } from "./types.js";
