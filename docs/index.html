@@ -132,7 +132,13 @@
 
         .error {
             color: #f87171;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .error-section {
+            min-height: 48px;
+            padding-top: 4px;
         }
 
         .examples {
@@ -244,6 +250,8 @@
             <div id="output" class="cron-result">Type something above...</div>
         </div>
 
+        <div id="error-output" class="error-section"></div>
+
         <div class="examples">
             <h3>Examples</h3>
             <div class="example-chips">
@@ -280,12 +288,14 @@
 
         const input = document.getElementById('input');
         const output = document.getElementById('output');
+        const errorOutput = document.getElementById('error-output');
 
         function updateCron() {
             const value = input.value.trim();
 
             if (!value) {
                 output.innerHTML = '<span style="color: #52525b;">Type something above...</span>';
+                errorOutput.innerHTML = '';
                 return;
             }
 
@@ -293,13 +303,16 @@
                 const result = cronned(value);
 
                 if ('unsupported' in result) {
-                    output.innerHTML = `<span class="error">${result.unsupported}</span>`;
+                    output.innerHTML = '<span style="color: #52525b;">? ? ? ? ?</span>';
+                    errorOutput.innerHTML = `<span class="error">${result.unsupported}</span>`;
                 } else {
                     const crons = result.crons.join('<br>');
                     output.innerHTML = `<span class="cron-result">${crons}</span>`;
+                    errorOutput.innerHTML = '';
                 }
             } catch (error) {
-                output.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+                output.innerHTML = '<span style="color: #52525b;">? ? ? ? ?</span>';
+                errorOutput.innerHTML = `<span class="error">Error: ${error.message}</span>`;
             }
         }
 
