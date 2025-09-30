@@ -205,4 +205,9 @@ MIT
 
 ## Contributing
 
-Contributions welcome! Please open an issue or PR.
+Contributions welcome! Just:
+- Add tests for new features
+- Run `pnpm test` before submitting
+- Keep it simple and focused
+
+Open a PR when ready!
