@@ -14,7 +14,7 @@
 ✅ Zero dependencies \
 ✅ TypeScript first \
 ✅ Handles edge cases and validates output \
-⚠️ Detects unsupported patterns (nth weekday, business days, etc.) \
+⚠️ Detects unsupported patterns (nth weekday, business days, etc.)
 
 ## Installation
 
