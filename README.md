@@ -224,3 +224,14 @@ Contributions welcome! Just:
 - Keep it simple and focused
 
 Tests run automatically on commit. Open a PR when ready!
+
+---
+
+## Support
+
+If cronify saves you time and you'd like to support its development:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow.svg?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/jszklarz)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-pink.svg?style=for-the-badge&logo=github)](https://github.com/sponsors/jszklarz)
+
+Every contribution helps maintain and improve this project. Thank you! ❤️
