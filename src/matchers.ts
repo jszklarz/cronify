@@ -140,7 +140,13 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
     }
   } else {
     // Individual weekday matching
-    const weekdayRegex = new RegExp(`(${weekdayKeys})`, 'g');
+    // Use word boundaries only if weekdays contain ASCII (English/Spanish)
+    // For CJK, weekdays are non-ASCII so \b doesn't work properly
+    const firstKey = Object.keys(weekdays)[0] || '';
+    const useBoundaries = /^[a-z]/.test(firstKey);
+    const weekdayRegex = useBoundaries
+      ? new RegExp(`\\b(${weekdayKeys})\\b`, 'g')
+      : new RegExp(`(${weekdayKeys})`, 'g');
     const weekdayMatches = [...normalizedText.matchAll(weekdayRegex)];
 
     if (weekdayMatches.length) {
@@ -150,16 +156,21 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
     }
   }
 
-  // Day of month (e.g., "on the 1st and 15th", "el 15 de enero", "el día 15")
+  // Day of month - flexible patterns
+  // English: "on the 1st", "January 5th", "the 15th of every month"
+  // Spanish: "el 15 de enero", "el día 15"
   const dayOfMonthMatches = [
     ...normalizedText.matchAll(/\bon\s+the\s+(\d{1,2})(st|nd|rd|th)?\b/g),
+    ...normalizedText.matchAll(/\bthe\s+(\d{1,2})(st|nd|rd|th)?\s+of\b/g),
+    ...normalizedText.matchAll(/\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(\d{1,2})(st|nd|rd|th)?\b/g),
     ...normalizedText.matchAll(/\b(el|los)\s+(día\s+)?(\d{1,2})(º|o)?\b/g),
   ];
   if (dayOfMonthMatches.length) {
     dayOfMonthMatches.forEach((match) => {
-      // For English pattern, day is in capture group 1
-      // For Spanish pattern, day is in capture group 3
-      const day = match[1] && /^\d/.test(match[1]) ? match[1] : match[3];
+      // Try different capture groups based on pattern
+      const day = match[1] && /^\d/.test(match[1]) ? match[1] :
+                  match[2] && /^\d/.test(match[2]) ? match[2] :
+                  match[3] && /^\d/.test(match[3]) ? match[3] : null;
       if (day) selectedMonthDays.push(parseInt(day, 10));
     });
   }
@@ -242,10 +253,11 @@ export function matchPatterns(normalizedText: string, locale?: LocaleConstants):
   ].filter(Boolean) as ParsedTime[];
 
   // Western time pattern (includes Spanish "de la" markers and decimal separator)
-  const timePattern = new RegExp(`${atPattern}\\s+(((?:la\\s+)?\\d{1,2})(?:[.:]\\d{2})?\\s*(?:am|pm|de\\s+la\\s+(?:mañana|madrugada|tarde|noche))?)`, 'g');
+  // Also match times after "and" without requiring another "at": "at 9am and 5pm"
+  const timePattern = new RegExp(`(${atPattern}|and)\\s+(((?:la\\s+)?\\d{1,2})(?:[.:]\\d{2})?\\s*(?:am|pm|de\\s+la\\s+(?:mañana|madrugada|tarde|noche))?)`, 'g');
   const explicitTimePhrases = [...normalizedText.matchAll(timePattern)];
   const westernParsedTimes = explicitTimePhrases
-    .map((match) => parseTime(match[2])) // Parse the full time expression
+    .map((match) => parseTime(match[3])) // Parse the full time expression (group shifted by 1)
     .filter(Boolean) as ParsedTime[];
 
   // Also catch standalone Spanish time patterns without "a las"

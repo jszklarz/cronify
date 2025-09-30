@@ -217,7 +217,8 @@ export function buildCronFields(
   }
 
   // Specific time(s)
-  if (matches.parsedTimes.length === 1) {
+  // Skip if we have a time window + interval (e.g., "every 15 minutes between 9am and 5pm")
+  if (matches.parsedTimes.length === 1 && !(matches.hourWindowRange && matches.everyNMinutes)) {
     const { hour24, minute } = matches.parsedTimes[0]!;
     minuteField = `${minute}`;
     hourField = `${isNaN(hour24) ? "*" : hour24}`;
