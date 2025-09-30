@@ -1,4 +1,4 @@
-# cronify
+![cronify](.github/assets/cronify_banner.png)
 
 🕐 **Convert natural language to cron expressions**
 
