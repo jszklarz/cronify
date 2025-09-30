@@ -209,4 +209,4 @@ Contributions welcome! Just:
 - Add tests for new features
 - Keep it simple and focused
 
-Tests run automatically on commit via husky. Open a PR when ready!
+Tests run automatically on commit. Open a PR when ready!
