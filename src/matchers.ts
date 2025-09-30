@@ -1,4 +1,4 @@
-import { WEEKDAYS, MONTHS } from "./constants.js";
+import { WEEKDAYS_EN, MONTHS_EN } from "./locales/en.js";
 import { parseTime, to24Hour } from "./parsers.js";
 import type { ParsedTime } from "./types.js";
 import type { LocaleConstants } from "./locales/index.js";
@@ -93,8 +93,8 @@ export function detectUnsupportedPatterns(text: string, locale?: LocaleConstants
  * ```
  */
 export function matchPatterns(normalizedText: string, locale?: LocaleConstants): MatchResults {
-  const weekdays = locale?.weekdays ?? WEEKDAYS;
-  const months = locale?.months ?? MONTHS;
+  const weekdays = locale?.weekdays ?? WEEKDAYS_EN;
+  const months = locale?.months ?? MONTHS_EN;
 
   const selectedMonths: number[] = [];
   const selectedWeekdays: number[] = [];
