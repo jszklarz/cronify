@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cronify - Natural Language to Cron</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .output {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            min-height: 60px;
+        }
+
+        .output-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cron-result {
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.95rem;
+        }
+
+        .examples {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .examples h3 {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .example-chip {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #555;
+        }
+
+        .example-chip:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>cronify</h1>
+        <p class="subtitle">Convert natural language to cron expressions</p>
+
+        <div>
+            <label for="input">Enter a schedule in plain English:</label>
+            <input
+                type="text"
+                id="input"
+                placeholder="e.g., every monday at 9am"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="output">
+            <div class="output-label">Cron Expression</div>
+            <div id="output" class="cron-result">Type something above...</div>
+        </div>
+
+        <div class="examples">
+            <h3>Try these examples:</h3>
+            <div class="example-chips">
+                <button class="example-chip" data-example="every monday at 9am">every monday at 9am</button>
+                <button class="example-chip" data-example="every weekday at 5pm">every weekday at 5pm</button>
+                <button class="example-chip" data-example="every 15 minutes">every 15 minutes</button>
+                <button class="example-chip" data-example="daily at midnight">daily at midnight</button>
+                <button class="example-chip" data-example="on the 1st and 15th at noon">on the 1st and 15th at noon</button>
+                <button class="example-chip" data-example="every hour between 9am and 5pm">every hour between 9am and 5pm</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <a href="https://github.com/jszklarz/cronify" target="_blank">View on GitHub</a> •
+            <a href="https://www.npmjs.com/package/cronify" target="_blank">npm package</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { cronify } from 'https://esm.sh/cronify@0.1.0';
+
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+
+        function updateCron() {
+            const value = input.value.trim();
+
+            if (!value) {
+                output.innerHTML = '<span style="color: #999;">Type something above...</span>';
+                return;
+            }
+
+            try {
+                const result = cronify(value);
+
+                if ('unsupported' in result) {
+                    output.innerHTML = `<span class="error">${result.unsupported}</span>`;
+                } else {
+                    const crons = result.crons.join('<br>');
+                    output.innerHTML = `<span class="cron-result">${crons}</span>`;
+                }
+            } catch (error) {
+                output.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+
+        input.addEventListener('input', updateCron);
+
+        // Example chips
+        document.querySelectorAll('.example-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                input.value = chip.dataset.example;
+                updateCron();
+                input.focus();
+            });
+        });
+
+        // Focus on load
+        input.focus();
+    </script>
+</body>
+</html>
