@@ -160,6 +160,24 @@ describe('cronned', () => {
       const result = cronned('  Every  MONDAY   at  9AM  ');
       expect(result).toEqual({ crons: ['0 9 * * 1'] });
     });
+
+    it('rejects gibberish input', () => {
+      const result = cronned('salfnaksjndaksnkda s daj skdj ak');
+      expect(result).toHaveProperty('unsupported');
+      expect(result).toMatchObject({
+        unsupported: expect.stringContaining('Could not understand'),
+      });
+    });
+
+    it('rejects empty input', () => {
+      const result = cronned('');
+      expect(result).toHaveProperty('unsupported');
+    });
+
+    it('rejects whitespace-only input', () => {
+      const result = cronned('   ');
+      expect(result).toHaveProperty('unsupported');
+    });
   });
 });
 

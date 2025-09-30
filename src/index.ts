@@ -39,6 +39,24 @@ export function cronned(input: string): CronResult {
   // Match patterns
   const matches = matchPatterns(normalizedText);
 
+  // Check if any meaningful patterns were matched
+  const hasAnyMatch =
+    matches.selectedMonths.length > 0 ||
+    matches.selectedWeekdays.length > 0 ||
+    matches.selectedMonthDays.length > 0 ||
+    matches.parsedTimes.length > 0 ||
+    matches.hourWindowRange !== null ||
+    matches.everyNMinutes !== null ||
+    matches.everyNHours !== null ||
+    matches.atPastEachHour !== null ||
+    /\b(every|hourly|daily|weekly|monthly|weekday|weekend|midnight|noon|minute|hour|day|week|month)\b/.test(normalizedText);
+
+  if (!hasAnyMatch) {
+    return {
+      unsupported: "Could not understand the input. Please use natural language like 'every monday at 9am'.",
+    };
+  }
+
   // Handle multiple distinct times (emit multiple cron lines)
   if (matches.parsedTimes.length > 1) {
     const fields = buildCronFields(normalizedText, {
