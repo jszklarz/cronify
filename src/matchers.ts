@@ -50,7 +50,7 @@ export interface MatchResults {
 export function detectUnsupportedPatterns(text: string, locale?: LocaleConstants): string | null {
   const weekdayKeys = locale ? Object.keys(locale.weekdays).join('|') : 'monday|tuesday|wednesday|thursday|friday|saturday|sunday';
 
-  const nthWeekdayPattern = new RegExp(`\\b(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto)\\s+(${weekdayKeys})\\b`);
+  const nthWeekdayPattern = new RegExp(`(^|\\s)(last|nth|first|second|third|fourth|último|primero|segundo|tercero|cuarto)\\s+(${weekdayKeys})\\b`);
   if (nthWeekdayPattern.test(text)) {
     return "Cron (standard) cannot express 'nth/last weekday of month'. Use RRULE or Quartz.";
   }
