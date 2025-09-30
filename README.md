@@ -4,7 +4,7 @@
 
 ### Convert natural language to cron expressions
 
-#### "every monday at 9am" → `0 9 * * 1`
+#### `every monday at 9am` → `0 9 * * 1`
 
 </div>
 
