@@ -30,6 +30,11 @@ describe('cronned', () => {
       const result = cronned('every tuesday at 9am');
       expect(result).toEqual({ crons: ['0 9 * * 2'] });
     });
+
+    it('handles "mon" in "month" without collision', () => {
+      const result = cronned('every month at midnight');
+      expect(result).toEqual({ crons: ['0 0 1 * *'] });
+    });
   });
 
   describe('dates and months', () => {

@@ -144,7 +144,7 @@ export function parseTime(timeString: string): ParsedTime | null {
 export function normalizeInput(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[,]+/g, " ")
+    .replace(/[,\.;!?]+/g, " ") // Strip common punctuation to spaces
     .replace(/\s+/g, " ")
     .trim();
 }
