@@ -164,19 +164,6 @@ if ("crons" in result) {
 }
 ```
 
-### Migration from v0.1.x
-
-The `cronifyString` function has been removed in v0.2.0 for better future-proofing. Migration is simple:
-
-```typescript
-// Before (v0.1.x)
-const cron = cronifyString("every monday at 9am");
-
-// After (v0.2.0+)
-const result = cronify("every monday at 9am");
-const cron = "crons" in result ? result.crons[0] : null;
-```
-
 ## Cron Format
 
 The generated cron expressions follow the standard 5-field format:
