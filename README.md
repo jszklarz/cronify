@@ -10,10 +10,9 @@
 
 ## Features
 
-✅ Supports times, weekdays, dates, intervals, and time windows \
+✅ Times, weekdays, dates, intervals, and time windows \
 ✅ Zero dependencies \
-✅ TypeScript first \
-✅ Handles edge cases and validates output \
+✅ Output validation \
 ⚠️ Detects unsupported patterns (nth weekday, business days, etc.)
 
 ## Installation
