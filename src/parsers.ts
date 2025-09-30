@@ -72,7 +72,29 @@ export function parseTime(timeString: string): ParsedTime | null {
     }
   }
 
-  const explicitTimeMatch = s.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/);
+  // Spanish time format with "de la" markers: "5 de la tarde", "8.30 de la mañana"
+  const spanishTimeMatch = s.match(/\b(\d{1,2})(?:[.:](\d{2}))?\s*(?:de\s+la\s+)?(mañana|madrugada|tarde|noche)\b/);
+  if (spanishTimeMatch) {
+    let hour = parseInt(spanishTimeMatch[1], 10);
+    const minute = spanishTimeMatch[2] ? parseInt(spanishTimeMatch[2], 10) : 0;
+    const period = spanishTimeMatch[3];
+
+    // Map Spanish time periods to 24h
+    if (period === 'tarde' && hour < 12) {
+      hour += 12; // Afternoon: 1pm-7pm
+    } else if (period === 'noche' && hour < 12) {
+      hour += 12; // Night: 8pm-11pm (or keep as evening hours)
+    } else if ((period === 'mañana' || period === 'madrugada') && hour === 12) {
+      hour = 0; // 12 de la mañana = midnight
+    }
+
+    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+      return { hour24: hour, minute };
+    }
+  }
+
+  // Standard format with AM/PM (supports both : and . as separator for Spanish)
+  const explicitTimeMatch = s.match(/\b(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\b/);
   if (explicitTimeMatch) {
     const parsedHour = to24Hour(
       parseInt(explicitTimeMatch[1], 10),

@@ -30,6 +30,21 @@ export function listToCron(
   if (!numberList || numberList.length === 0) return allowStar ? "*" : "0";
   const uniqueSorted = [...new Set(numberList)].sort((a, b) => a - b);
   if (uniqueSorted.length === maxValue) return "*";
+
+  // Detect consecutive ranges (e.g., [1,2,3,4,5] -> "1-5")
+  if (uniqueSorted.length > 2) {
+    let isConsecutive = true;
+    for (let i = 1; i < uniqueSorted.length; i++) {
+      if (uniqueSorted[i] !== uniqueSorted[i - 1] + 1) {
+        isConsecutive = false;
+        break;
+      }
+    }
+    if (isConsecutive) {
+      return `${uniqueSorted[0]}-${uniqueSorted[uniqueSorted.length - 1]}`;
+    }
+  }
+
   return uniqueSorted.join(",");
 }
 
