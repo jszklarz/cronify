@@ -14,8 +14,8 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e4e4e7;
+            background: #09090b;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -26,89 +26,104 @@
         .container {
             max-width: 700px;
             width: 100%;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: #18181b;
+            border-radius: 12px;
+            border: 1px solid #27272a;
             padding: 40px;
         }
 
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #a78bfa 0%, #818cf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-weight: 600;
         }
 
         .subtitle {
-            color: #666;
-            margin-bottom: 30px;
+            color: #a1a1aa;
+            margin-bottom: 40px;
             font-size: 1.1rem;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #e4e4e7;
+            font-size: 0.9rem;
         }
 
         input {
             width: 100%;
-            padding: 14px;
+            padding: 14px 16px;
             font-size: 1rem;
-            border: 2px solid #e0e0e0;
+            background: #09090b;
+            color: #e4e4e7;
+            border: 1px solid #27272a;
             border-radius: 8px;
-            transition: border-color 0.3s;
+            transition: all 0.2s;
             font-family: inherit;
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #6366f1;
+            background: #0c0c0e;
+        }
+
+        input::placeholder {
+            color: #52525b;
         }
 
         .output {
             margin-top: 30px;
             padding: 20px;
-            background: #f8f9fa;
+            background: #09090b;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
-            min-height: 60px;
+            border: 1px solid #27272a;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .output-label {
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
+            font-weight: 500;
+            color: #a1a1aa;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
         }
 
         .cron-result {
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
             font-size: 1.3rem;
-            color: #667eea;
-            font-weight: bold;
+            color: #a78bfa;
+            font-weight: 500;
+            letter-spacing: 0.02em;
         }
 
         .error {
-            color: #e74c3c;
+            color: #f87171;
             font-size: 0.95rem;
         }
 
         .examples {
             margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            padding-top: 30px;
+            border-top: 1px solid #27272a;
         }
 
         .examples h3 {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
         }
 
         .example-chips {
@@ -118,39 +133,51 @@
         }
 
         .example-chip {
-            padding: 6px 12px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 20px;
+            padding: 8px 14px;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 6px;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s;
-            color: #555;
+            transition: all 0.15s;
+            color: #e4e4e7;
+            font-weight: 400;
         }
 
         .example-chip:hover {
-            background: #667eea;
-            color: white;
+            background: #3f3f46;
+            border-color: #52525b;
             transform: translateY(-1px);
         }
 
         .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #27272a;
             text-align: center;
-            color: #666;
+            color: #71717a;
             font-size: 0.9rem;
         }
 
         .footer a {
-            color: #667eea;
+            color: #a78bfa;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
+            transition: color 0.15s;
         }
 
         .footer a:hover {
-            text-decoration: underline;
+            color: #c4b5fd;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -160,11 +187,11 @@
         <p class="subtitle">Convert natural language to cron expressions</p>
 
         <div>
-            <label for="input">Enter a schedule in plain English:</label>
+            <label for="input">Enter a schedule in plain English</label>
             <input
                 type="text"
                 id="input"
-                placeholder="e.g., every monday at 9am"
+                placeholder="every monday at 9am"
                 autocomplete="off"
             >
         </div>
@@ -175,7 +202,7 @@
         </div>
 
         <div class="examples">
-            <h3>Try these examples:</h3>
+            <h3>Examples</h3>
             <div class="example-chips">
                 <button class="example-chip" data-example="every monday at 9am">every monday at 9am</button>
                 <button class="example-chip" data-example="every weekday at 5pm">every weekday at 5pm</button>
@@ -187,8 +214,9 @@
         </div>
 
         <div class="footer">
-            <a href="https://github.com/jszklarz/cronify" target="_blank">View on GitHub</a> •
-            <a href="https://www.npmjs.com/package/cronify" target="_blank">npm package</a>
+            <a href="https://github.com/jszklarz/cronify" target="_blank">GitHub</a>
+            <span style="color: #3f3f46; margin: 0 8px;">•</span>
+            <a href="https://www.npmjs.com/package/cronify" target="_blank">npm</a>
         </div>
     </div>
 
@@ -202,7 +230,7 @@
             const value = input.value.trim();
 
             if (!value) {
-                output.innerHTML = '<span style="color: #999;">Type something above...</span>';
+                output.innerHTML = '<span style="color: #52525b;">Type something above...</span>';
                 return;
             }
 
