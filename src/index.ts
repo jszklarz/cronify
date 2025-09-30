@@ -17,17 +17,17 @@ import { buildCronFields, formatCron } from "./cron-builder.js";
  *
  * @example
  * ```typescript
- * cronify("every monday at 9am")
+ * cronned("every monday at 9am")
  * // => { crons: ["0 9 * * 1"] }
  *
- * cronify("at 9am and 5pm on weekdays")
+ * cronned("at 9am and 5pm on weekdays")
  * // => { crons: ["0 9 * * 1-5", "0 17 * * 1-5"] }
  *
- * cronify("last friday of the month")
+ * cronned("last friday of the month")
  * // => { unsupported: "Cron (standard) cannot express 'nth/last weekday of month'..." }
  * ```
  */
-export function cronify(input: string): CronResult {
+export function cronned(input: string): CronResult {
   const normalizedText = normalizeInput(input);
 
   // Hard limitations – detect & refuse early

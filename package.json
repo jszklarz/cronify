@@ -1,5 +1,5 @@
 {
-  "name": "@jszkl/cronify",
+  "name": "@jszkl/cronned",
   "version": "0.2.0",
   "description": "Convert natural language to cron expressions.",
   "keywords": [
@@ -16,12 +16,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jszklarz/cronify.git"
+    "url": "https://github.com/jszklarz/cronned.git"
   },
   "bugs": {
-    "url": "https://github.com/jszklarz/cronify/issues"
+    "url": "https://github.com/jszklarz/cronned/issues"
   },
-  "homepage": "https://github.com/jszklarz/cronify#readme",
+  "homepage": "https://github.com/jszklarz/cronned#readme",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

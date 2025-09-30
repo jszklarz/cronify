@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cronify } from './index';
+import { cronned } from './index';
 
 /**
  * ReDoS (Regular Expression Denial of Service) protection tests.
@@ -19,7 +19,7 @@ describe('ReDoS protection', () => {
       () => {
         // Repeat "monday " 1000 times
         const input = 'monday '.repeat(1000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -29,7 +29,7 @@ describe('ReDoS protection', () => {
       'handles extremely long repeated "every" keywords',
       () => {
         const input = 'every '.repeat(1000) + 'day';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -39,7 +39,7 @@ describe('ReDoS protection', () => {
       'handles repeated "at" keywords',
       () => {
         const input = 'at '.repeat(1000) + '9am';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -51,7 +51,7 @@ describe('ReDoS protection', () => {
       'handles excessive spaces',
       () => {
         const input = 'every' + ' '.repeat(10000) + 'monday';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -65,7 +65,7 @@ describe('ReDoS protection', () => {
           input += 'a ';
         }
         input += 'monday';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -77,7 +77,7 @@ describe('ReDoS protection', () => {
       'handles excessive commas',
       () => {
         const input = ','.repeat(10000) + 'every monday';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -87,7 +87,7 @@ describe('ReDoS protection', () => {
       'handles alternating commas and spaces',
       () => {
         const input = ', '.repeat(5000) + 'every monday';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -99,7 +99,7 @@ describe('ReDoS protection', () => {
       'handles repeated time-like patterns',
       () => {
         const input = '99:99 '.repeat(1000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -109,7 +109,7 @@ describe('ReDoS protection', () => {
       'handles repeated "between" keywords',
       () => {
         const input = 'between '.repeat(1000) + '9am and 5pm';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -119,7 +119,7 @@ describe('ReDoS protection', () => {
       'handles alternating numbers and colons',
       () => {
         const input = '1:2:3:4:5:'.repeat(1000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -131,7 +131,7 @@ describe('ReDoS protection', () => {
       'handles repeated "on the" patterns',
       () => {
         const input = 'on the '.repeat(1000) + '1st';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -141,7 +141,7 @@ describe('ReDoS protection', () => {
       'handles repeated ordinal suffixes',
       () => {
         const input = 'on the 1stndrdth'.repeat(500);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -155,7 +155,7 @@ describe('ReDoS protection', () => {
         const input = 'january february march april may june july august september october november december '.repeat(
           100,
         );
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -167,7 +167,7 @@ describe('ReDoS protection', () => {
       'handles 100KB of random text',
       () => {
         const input = 'x'.repeat(100000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -177,7 +177,7 @@ describe('ReDoS protection', () => {
       'handles 100KB of valid keywords',
       () => {
         const input = 'every monday at 9am '.repeat(5000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -190,7 +190,7 @@ describe('ReDoS protection', () => {
       () => {
         // Patterns like "aaaaaaaaaaaab" that don't match expected patterns
         const input = 'a'.repeat(10000) + 'b';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -201,7 +201,7 @@ describe('ReDoS protection', () => {
       () => {
         // "mondaymondaymonday" without spaces - shouldn't match but shouldn't hang
         const input = 'monday'.repeat(1000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -213,7 +213,7 @@ describe('ReDoS protection', () => {
       'handles unicode characters',
       () => {
         const input = '\u{1F4A9}'.repeat(1000) + ' every monday';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -223,7 +223,7 @@ describe('ReDoS protection', () => {
       'handles mixed unicode and ascii',
       () => {
         const input = 'every \u{1F4A9} monday \u{1F4A9} at \u{1F4A9} 9am';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -235,7 +235,7 @@ describe('ReDoS protection', () => {
       'handles maximum valid day numbers repeated',
       () => {
         const input = 'on the 31st '.repeat(1000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -245,7 +245,7 @@ describe('ReDoS protection', () => {
       'handles maximum valid hour values repeated',
       () => {
         const input = 'at 23:59 '.repeat(1000);
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -262,7 +262,7 @@ describe('ReDoS protection', () => {
           'every'.repeat(100) +
           ' monday'.repeat(100) +
           ' at 9am';
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,
@@ -275,7 +275,7 @@ describe('ReDoS protection', () => {
         for (let i = 0; i < 100; i++) {
           input += 'every monday xxxxxxxx ';
         }
-        const result = cronify(input);
+        const result = cronned(input);
         expect(result).toBeDefined();
       },
       TIMEOUT_MS,

@@ -1,4 +1,4 @@
-![cronify](.github/assets/cronify_banner.png)
+![cronned](.github/assets/cronned_banner.png)
 
 <div align="center">
 
@@ -6,14 +6,14 @@
 
 #### `every monday at 9am` → `0 9 * * 1`
 
-[![npm version](https://img.shields.io/npm/v/@jszkl/cronify.svg)](https://www.npmjs.com/package/@jszkl/cronify)
-[![Tests](https://github.com/jszklarz/cronify/actions/workflows/publish.yml/badge.svg)](https://github.com/jszklarz/cronify/actions/workflows/publish.yml)
-[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://jszklarz.github.io/cronify/)
+[![npm version](https://img.shields.io/npm/v/@jszkl/cronned.svg)](https://www.npmjs.com/package/@jszkl/cronned)
+[![Tests](https://github.com/jszklarz/cronned/actions/workflows/publish.yml/badge.svg)](https://github.com/jszklarz/cronned/actions/workflows/publish.yml)
+[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://jszklarz.github.io/cronned/)
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow.svg?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/jszklarz)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-pink.svg?style=for-the-badge&logo=github)](https://github.com/sponsors/jszklarz)
 
-**[Try the live demo →](https://jszklarz.github.io/cronify/)**
+**[Try the live demo →](https://jszklarz.github.io/cronned/)**
 
 </div>
 
@@ -27,19 +27,19 @@
 ## Installation
 
 ```bash
-npm install @jszkl/cronify
+npm install @jszkl/cronned
 # or
-pnpm add @jszkl/cronify
+pnpm add @jszkl/cronned
 # or
-yarn add @jszkl/cronify
+yarn add @jszkl/cronned
 ```
 
 ## Quick Start
 
 ```typescript
-import { cronify } from '@jszkl/cronify';
+import { cronned } from '@jszkl/cronned';
 
-const result = cronify("every monday at 9am");
+const result = cronned("every monday at 9am");
 // => { crons: ["0 9 * * 1"] }
 
 // Check if conversion succeeded
@@ -55,71 +55,71 @@ if ("crons" in result) {
 ### Basic Schedules
 
 ```typescript
-cronify("every monday at 9am")
+cronned("every monday at 9am")
 // => { crons: ["0 9 * * 1"] }
 
-cronify("every day at midnight")
+cronned("every day at midnight")
 // => { crons: ["0 0 * * *"] }
 
-cronify("daily at 9:30am")
+cronned("daily at 9:30am")
 // => { crons: ["30 9 * * *"] }
 
-cronify("hourly")
+cronned("hourly")
 // => { crons: ["0 * * * *"] }
 
-cronify("every 15 minutes")
+cronned("every 15 minutes")
 // => { crons: ["*/15 * * * *"] }
 ```
 
 ### Weekdays
 
 ```typescript
-cronify("every weekday at 9am")
+cronned("every weekday at 9am")
 // => { crons: ["0 9 * * 1-5"] }
 
-cronify("every weekend at noon")
+cronned("every weekend at noon")
 // => { crons: ["0 12 * * 0,6"] }
 
-cronify("every monday and friday at 5pm")
+cronned("every monday and friday at 5pm")
 // => { crons: ["0 17 * * 1,5"] }
 ```
 
 ### Dates and Months
 
 ```typescript
-cronify("on the 1st at midnight")
+cronned("on the 1st at midnight")
 // => { crons: ["0 0 1 * *"] }
 
-cronify("on the 1st and 15th at 9am")
+cronned("on the 1st and 15th at 9am")
 // => { crons: ["0 9 1,15 * *"] }
 
-cronify("every month on the 1st at midnight")
+cronned("every month on the 1st at midnight")
 // => { crons: ["0 0 1 * *"] }
 
-cronify("every january at midnight")
+cronned("every january at midnight")
 // => { crons: ["0 0 * 1 *"] }
 
-cronify("quarterly at midnight")
+cronned("quarterly at midnight")
 // => { crons: ["0 0 * 1,4,7,10 *"] }
 ```
 
 ### Time Windows
 
 ```typescript
-cronify("every 15 minutes between 9am and 5pm")
+cronned("every 15 minutes between 9am and 5pm")
 // => { crons: ["*/15 9-17 * * *"] }
 
-cronify("hourly between 9am and 5pm")
+cronned("hourly between 9am and 5pm")
 // => { crons: ["0 9-17 * * *"] }
 ```
 
 ### Multiple Times
 
 ```typescript
-cronify("at 9am and 5pm on weekdays")
+cronned("at 9am and 5pm on weekdays")
 // => { crons: ["0 9 * * 1-5", "0 17 * * 1-5"] }
 
-cronify("at 8am, 12pm, and 6pm every day")
+cronned("at 8am, 12pm, and 6pm every day")
 // => { crons: ["0 8 * * *", "0 12 * * *", "0 18 * * *"] }
 ```
 
@@ -128,19 +128,19 @@ cronify("at 8am, 12pm, and 6pm every day")
 Some patterns are beyond standard cron capabilities:
 
 ```typescript
-cronify("last friday of the month")
+cronned("last friday of the month")
 // => { unsupported: "Cron (standard) cannot express 'nth/last weekday of month'..." }
 
-cronify("every business day")
+cronned("every business day")
 // => { unsupported: "'Business days' and holiday calendars are beyond plain cron..." }
 
-cronify("last day of the month")
+cronned("last day of the month")
 // => { unsupported: "'Last day of month' is not in standard cron..." }
 ```
 
 ## API
 
-### `cronify(input: string): CronResult`
+### `cronned(input: string): CronResult`
 
 Convert natural language to cron expression(s). Returns a discriminated union:
 
@@ -157,7 +157,7 @@ type CronResult =
 
 **Example:**
 ```typescript
-const result = cronify("every monday at 9am");
+const result = cronned("every monday at 9am");
 if ("crons" in result) {
   // Success: result.crons is string[]
   console.log(result.crons[0]);
